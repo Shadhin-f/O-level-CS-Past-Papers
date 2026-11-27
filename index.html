@@ -7,13 +7,14 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--ink:#1d2433;--muted:#5b6475;--line:#d9dde5;--bg:#ffffff;--soft:#f3f5f9;--p1:#1f5fa8;--p2:#8a4b0f;--sel:#fff4c7;--bar:#c9d0dc;--topH:42vh;--leftW:50%}
+:root{--ink:#1d2433;--muted:#5b6475;--line:#d9dde5;--bg:#ffffff;--soft:#f3f5f9;--panel:#ffffff;--hdr:#1d2433;--hov:#e7ebf2;--rowhov:#eef3fb;--shade:#f8f9fb;--hintbg:#fafbfc;--p1:#1f5fa8;--p2:#8a4b0f;--sel:#fff4c7;--bar:#c9d0dc;--topH:42vh;--leftW:50%;color-scheme:light}
+[data-theme=dark]{--ink:#e3e8f1;--muted:#9aa4b7;--line:#2c3445;--bg:#131823;--soft:#1a202d;--panel:#131823;--hdr:#0c1018;--hov:#232b3c;--rowhov:#1f2b42;--shade:#171d29;--hintbg:#161b26;--p1:#6ea8ff;--p2:#e3a35f;--sel:#4a3d12;--bar:#2c3445;color-scheme:dark}
 *{box-sizing:border-box;min-width:0}
 [hidden]{display:none!important}
 html,body{height:100%;margin:0}
 body{font:14px/1.45 Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:var(--bg);overflow:hidden}
 #app{height:100vh;display:grid;grid-template-rows:auto var(--topH) 10px minmax(0,1fr)}
-header{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;padding:10px 14px;background:var(--ink);color:#fff}
+header{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;padding:10px 14px;background:var(--hdr);color:#fff}
 header h1{font-size:16px;margin:0;font-weight:700;white-space:nowrap}
 header .sub{color:#b8c1d1;font-size:12.5px}
 .ctrls{display:flex;flex-wrap:wrap;gap:8px;margin-left:auto;align-items:center}
@@ -28,20 +29,20 @@ button:hover{background:#364059}
 #topics{overflow:auto;background:var(--soft);border-right:1px solid var(--line);padding:6px 0}
 .grp{font-size:11.5px;font-weight:700;color:var(--muted);padding:10px 12px 4px}
 .tp{display:flex;gap:6px;align-items:baseline;width:100%;text-align:left;background:none;border:0;border-left:3px solid transparent;color:var(--ink);border-radius:0;padding:5px 10px 5px 9px;font-size:13px}
-.tp:hover{background:#e7ebf2}
-.tp.on{background:#fff;border-left-color:var(--p1);font-weight:600}
+.tp:hover{background:var(--hov)}
+.tp.on{background:var(--panel);border-left-color:var(--p1);font-weight:600}
 .tp.p2.on{border-left-color:var(--p2)}
 .tp .n{margin-left:auto;color:var(--muted);font-size:11.5px;font-weight:400;white-space:nowrap}
 #list{overflow:auto}
-#thead{position:sticky;top:0;background:#fff;z-index:1;padding:10px 14px 8px;border-bottom:1px solid var(--line)}
+#thead{position:sticky;top:0;background:var(--panel);z-index:1;padding:10px 14px 8px;border-bottom:1px solid var(--line)}
 #thead h2{margin:0;font-size:16px}
 #thead p{margin:2px 0 0;color:var(--muted);font-size:12.5px}
 table{border-collapse:collapse;width:100%}
 td{padding:6px 10px;border-bottom:1px solid var(--line);vertical-align:top}
 tr.q{cursor:pointer}
-tr.q:hover td{background:#eef3fb}
+tr.q:hover td{background:var(--rowhov)}
 tr.q.sel td{background:var(--sel)}
-tr.shade td{background:#f8f9fb}
+tr.shade td{background:var(--shade)}
 td.src{font-weight:600;white-space:nowrap;font-size:12.5px}
 td.mk{text-align:right;color:var(--muted);white-space:nowrap;font-size:12.5px}
 td.tag{font-size:11.5px;color:var(--muted);white-space:nowrap}
@@ -67,10 +68,41 @@ td.tag{font-size:11.5px;color:var(--muted);white-space:nowrap}
 #right .ph .tick{background:#2e8b57}
 .scroller{flex:1;overflow:auto;scrollbar-gutter:stable;background:#525659}
 .scroller iframe{display:block;width:100%;height:100%;border:0;background:#525659}
-.hint{flex:1;display:grid;place-items:center;color:var(--muted);text-align:center;padding:20px;background:#fafbfc}
+.hint{flex:1;display:grid;place-items:center;color:var(--muted);text-align:center;padding:20px;background:var(--hintbg)}
 body.dragging iframe{pointer-events:none}
 body.dragging{user-select:none}
 @media(max-width:700px){#top{grid-template-columns:1fr}#topics{display:none}input{width:150px}}
+/* header toggles */
+button.tg[aria-pressed=true]{background:#1f5fa8;border-color:#4a86d6}
+button.tg[aria-pressed=true]:hover{background:#2a6cbc}
+/* practice mode: cover over the answer pane */
+#right{position:relative}
+#cover{position:absolute;left:0;right:0;bottom:0;top:38px;z-index:2;display:grid;place-items:center;text-align:center;padding:20px;background:var(--hintbg)}
+#cover .in{display:flex;flex-direction:column;align-items:center;gap:10px;max-width:340px}
+#cover strong{font-size:15px}
+#cover p{margin:0;color:var(--muted);font-size:13px}
+#cover button,.ph button{background:var(--p1);border-color:var(--p1);color:#fff;font-weight:600}
+#cover button{padding:9px 18px;font-size:14px}
+#cover button:hover,.ph button:hover{filter:brightness(1.1);background:var(--p1)}
+[data-theme=dark] #cover button,[data-theme=dark] .ph button{color:#0c1018}
+.ph button{margin-left:auto;padding:3px 10px;font-size:12px;white-space:nowrap;flex:none}
+.ph button + a{margin-left:8px}
+/* contact dialog */
+#contact{border:1px solid var(--line);border-radius:10px;padding:0;width:min(440px,92vw);background:var(--bg);color:var(--ink);box-shadow:0 20px 60px rgba(0,0,0,.35)}
+#contact::backdrop{background:rgba(10,14,22,.55)}
+#contact form{display:flex;flex-direction:column;gap:12px;padding:20px}
+#contact h2{margin:0;font-size:17px}
+#contact .note{margin:-6px 0 0;color:var(--muted);font-size:12.5px}
+#contact label{display:flex;flex-direction:column;gap:4px;font-size:12.5px;font-weight:600;color:var(--muted)}
+#contact input,#contact select,#contact textarea{width:100%;font:inherit;font-size:14px;background:var(--soft);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:8px 10px}
+#contact textarea{min-height:120px;resize:vertical}
+#contact .row{display:flex;gap:8px;justify-content:flex-end;margin-top:4px}
+#contact .row button{padding:8px 16px}
+#contact .row .ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+#contact .row .go{background:var(--p1);border-color:var(--p1);color:#fff;font-weight:600}
+[data-theme=dark] #contact .row .go{color:#0c1018}
+#contact .alt{font-size:12px;color:var(--muted);margin:0}
+#contact .alt a{color:var(--p1)}
 /* loading screen */
 #loader{position:fixed;inset:0;z-index:100;display:grid;place-items:center;background:radial-gradient(ellipse at 50% 40%,#2a3346 0%,#1d2433 60%,#141925 100%);color:#fff;transition:opacity .5s ease,visibility .5s ease}
 #loader.done{opacity:0;visibility:hidden}
@@ -92,6 +124,12 @@ body.dragging{user-select:none}
 @keyframes slide{0%{transform:translateX(-100%)}100%{transform:translateX(290%)}}
 @media(prefers-reduced-motion:reduce){.chip,.track i{animation:none}#loader{transition:none}}
 </style>
+<script>
+/* apply the saved theme (or the system preference) before the page paints */
+(function(){ var t = null; try { t = localStorage.getItem("cs2210_theme"); } catch(e){}
+  if (!t) t = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  document.documentElement.setAttribute("data-theme", t); })();
+</script>
 </head>
 <body>
 <div id="loader" role="status" aria-live="polite">
@@ -133,7 +171,10 @@ body.dragging{user-select:none}
       <select id="fv" aria-label="Viewer">
         <option value="google">Viewer: Google (recommended)</option>
       </select>
+      <button id="practice" class="tg" aria-pressed="false" title="Hide the mark scheme until you choose to see it">Practice mode: Off</button>
+      <button id="theme" title="Switch between light and dark theme">Dark theme</button>
       <button id="reset" title="Reset frame sizes">Reset layout</button>
+      <button id="contactBtn" title="Send a question, bug report or suggestion">Contact</button>
     </div>
   </header>
 
@@ -155,12 +196,40 @@ body.dragging{user-select:none}
     </div>
     <div id="vbar" class="bar" role="separator" aria-orientation="vertical" title="Drag to resize (double-click to reset)"></div>
     <div id="right" class="pane">
-      <div class="ph"><span class="tick"></span><b>Answer (mark scheme)</b><span class="what" id="rw"></span><a id="ro" href="#" target="_blank" rel="noopener" hidden>Open in new tab ↗</a></div>
+      <div class="ph"><span class="tick"></span><b>Answer (mark scheme)</b><span class="what" id="rw"></span><button id="rehide" hidden title="Cover the answer again">Hide answer</button><a id="ro" href="#" target="_blank" rel="noopener" hidden>Open in new tab ↗</a></div>
       <div class="hint" id="rh">The matching mark scheme opens here.</div>
       <div class="scroller" id="rs" hidden><iframe id="rf" title="Mark scheme"></iframe></div>
+      <div id="cover" hidden>
+        <div class="in">
+          <strong>Practice mode</strong>
+          <p>Answer the question on paper first, then check yourself against the mark scheme.</p>
+          <button id="reveal">Show answer</button>
+        </div>
+      </div>
     </div>
   </section>
 </div>
+
+<dialog id="contact" aria-labelledby="ctitle">
+  <form id="cform" novalidate>
+    <h2 id="ctitle">Contact</h2>
+    <p class="note">Questions, bug reports and suggestions are all welcome.</p>
+    <label>Type
+      <select id="ckind"><option>Inquiry</option><option>Bug report</option><option>Suggestion</option></select>
+    </label>
+    <label>Your name (optional)
+      <input id="cname" type="text" autocomplete="name">
+    </label>
+    <label>Message
+      <textarea id="cmsg" required placeholder="What would you like to ask or report?"></textarea>
+    </label>
+    <p class="alt">This opens your email app with the message ready to send. You can also email <a href="mailto:tj.shadhin001@gmail.com">tj.shadhin001@gmail.com</a> directly.</p>
+    <div class="row">
+      <button type="button" class="ghost" id="ccancel">Cancel</button>
+      <button type="submit" class="go">Open in email app</button>
+    </div>
+  </form>
+</dialog>
 
 <script>
 {
@@ -283,7 +352,50 @@ function open(i){
   $("lh").hidden = $("rh").hidden = true; $("ls").hidden = $("rs").hidden = false;
   show(P.L, L, r.pq);
   show(P.R, R, r.pm);
+  revealed = false; syncCover();
 }
+
+/* practice mode: the mark scheme stays covered until "Show answer" is clicked, for every new question */
+let practice = store.get("practice") === "1", revealed = false;
+function syncCover(){
+  const covered = practice && cur.sel !== null && !revealed;
+  $("cover").hidden = !covered;
+  $("rs").style.visibility = covered ? "hidden" : "";
+  $("rw").style.visibility = covered ? "hidden" : "";
+  if (cur.sel !== null) $("ro").hidden = covered;
+  $("rehide").hidden = !(practice && cur.sel !== null && revealed);
+  $("practice").setAttribute("aria-pressed", practice);
+  $("practice").textContent = "Practice mode: " + (practice ? "On" : "Off");
+  $("rh").textContent = practice ? "Practice mode is on: the mark scheme stays hidden until you click Show answer."
+                                 : "The matching mark scheme opens here.";
+}
+$("practice").addEventListener("click", () => { practice = !practice; revealed = false; store.set("practice", practice ? "1" : "0"); syncCover(); });
+$("reveal").addEventListener("click", () => { revealed = true; syncCover(); });
+$("rehide").addEventListener("click", () => { revealed = false; syncCover(); });
+syncCover();
+
+/* theme */
+function syncTheme(){ const dark = document.documentElement.getAttribute("data-theme") === "dark";
+  $("theme").textContent = dark ? "Light theme" : "Dark theme"; }
+$("theme").addEventListener("click", () => {
+  const H = document.documentElement, next = H.getAttribute("data-theme") === "dark" ? "light" : "dark";
+  H.setAttribute("data-theme", next); store.set("theme", next); syncTheme(); });
+syncTheme();
+
+/* contact: opens the visitor's email app with the message filled in */
+const CONTACT = "tj.shadhin001@gmail.com";
+$("contactBtn").addEventListener("click", () => { $("cmsg").setCustomValidity(""); $("contact").showModal(); });
+$("ccancel").addEventListener("click", () => $("contact").close());
+$("contact").addEventListener("click", e => { if (e.target === $("contact")) $("contact").close(); });
+$("cform").addEventListener("submit", e => {
+  e.preventDefault();
+  const kind = $("ckind").value, name = $("cname").value.trim(), msg = $("cmsg").value.trim();
+  if (!msg){ $("cmsg").reportValidity(); return; }
+  const where = cur.sel !== null ? "\n\nQuestion open: " + longLabel(rows[cur.sel]) : "";
+  const body = msg + where + (name ? "\n\nFrom: " + name : "") + "\n\nSent from O Level CS Past Papers";
+  location.href = "mailto:" + CONTACT + "?subject=" + encodeURIComponent("[O Level CS Past Papers] " + kind) + "&body=" + encodeURIComponent(body);
+  $("contact").close(); $("cform").reset();
+});
 
 $("topics").addEventListener("click", e => { const b = e.target.closest(".tp"); if (!b) return;
   cur.topic = b.dataset.k; prevTopic = null; store.set("topic", cur.topic); render(); $("list").scrollTop = 0; });
