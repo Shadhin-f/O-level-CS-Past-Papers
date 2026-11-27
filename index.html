@@ -132,11 +132,7 @@ body.dragging{user-select:none}
       <select id="fs" aria-label="Session"><option value="">All sessions</option></select>
       <select id="fv" aria-label="Viewer">
         <option value="google">Viewer: Google (recommended)</option>
-        <option value="direct">Viewer: browser PDF (if your browser allows)</option>
-        <option value="local">Viewer: my downloaded PDFs (offline)</option>
       </select>
-      <button id="pick" hidden title="Select the folder where you saved the 2210 PDFs">Choose PDF folder</button>
-      <input id="dir" type="file" webkitdirectory directory multiple hidden>
       <button id="reset" title="Reset frame sizes">Reset layout</button>
     </div>
   </header>
@@ -179,22 +175,19 @@ let cur = {topic: store.get("topic") || D.topics[0].k, sel: null, paperL: null, 
 if (!(cur.topic in topicIdx) && cur.topic !== "ALL") cur.topic = D.topics[0].k;
 
 for (const [k,lab] of Object.entries(D.sessions)) $("fs").insertAdjacentHTML("beforeend", `<option value="${k}">${esc(lab)}</option>`);
-$("fv").value = store.get("viewer3") || "google";
+$("fv").value = "google";
 
 const label = r => `${D.short[r.s]} · P${r.v} · Q${r.q}`;
 const longLabel = r => `${D.sessions[r.s]} · Paper ${r.v} · Question ${r.q}`;
 const qp = (s,v) => `${BASE}2210_${s}_qp_${v}.pdf`;
 const ms = (s,v) => `${BASE}2210_${s}_ms_${v}.pdf`;
-const files = {};
 const fname = u => u.split("/").pop();
 function view(u, page){
   const m = $("fv").value;
   const frag = page ? "#page=" + page : "";
   if (m === "google") return "https://docs.google.com/viewer?embedded=true&url=" + encodeURIComponent(u);
-  if (m === "local") return (files[fname(u).toLowerCase()] || fname(u)) + frag; /* picked folder, else same folder as this page */
   return u + frag;
 }
-function syncPick(){ $("pick").hidden = $("fv").value !== "local"; }
 
 function filtered(){
   const term = $("q").value.trim().toLowerCase(), ses = $("fs").value;
@@ -304,18 +297,6 @@ $("rows").addEventListener("keydown", e => {
 });
 $("q").addEventListener("input", render);
 $("fs").addEventListener("change", render);
-$("fv").addEventListener("change", () => { store.set("viewer3", $("fv").value); syncPick(); P.L.src = P.R.src = ""; if (cur.sel !== null) open(cur.sel); });
-$("pick").addEventListener("click", () => $("dir").click());
-$("dir").addEventListener("change", e => {
-  for (const u of Object.values(files)) URL.revokeObjectURL(u);
-  for (const k of Object.keys(files)) delete files[k];
-  for (const f of e.target.files) if (/\.pdf$/i.test(f.name))
-    files[f.name.toLowerCase()] = URL.createObjectURL(f.type ? f : new Blob([f], {type: "application/pdf"}));
-  const n = Object.keys(files).length;
-  $("pick").textContent = n ? `PDF folder: ${n} files` : "Choose PDF folder";
-  P.L.src = P.R.src = ""; if (cur.sel !== null) open(cur.sel);
-});
-syncPick();
 
 /* resizable frames */
 const root = document.documentElement;
