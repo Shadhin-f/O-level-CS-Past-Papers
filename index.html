@@ -88,21 +88,15 @@ button.tg[aria-pressed=true]:hover{background:#2a6cbc}
 .ph button{margin-left:auto;padding:3px 10px;font-size:12px;white-space:nowrap;flex:none}
 .ph button + a{margin-left:8px}
 /* contact dialog */
-#contact{border:1px solid var(--line);border-radius:10px;padding:0;width:min(440px,92vw);background:var(--bg);color:var(--ink);box-shadow:0 20px 60px rgba(0,0,0,.35)}
+#contact{border:1px solid var(--line);border-radius:10px;padding:22px;width:min(400px,92vw);background:var(--bg);color:var(--ink);box-shadow:0 20px 60px rgba(0,0,0,.35)}
 #contact::backdrop{background:rgba(10,14,22,.55)}
-#contact form{display:flex;flex-direction:column;gap:12px;padding:20px}
-#contact h2{margin:0;font-size:17px}
-#contact .note{margin:-6px 0 0;color:var(--muted);font-size:12.5px}
-#contact label{display:flex;flex-direction:column;gap:4px;font-size:12.5px;font-weight:600;color:var(--muted)}
-#contact input,#contact select,#contact textarea{width:100%;font:inherit;font-size:14px;background:var(--soft);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:8px 10px}
-#contact textarea{min-height:120px;resize:vertical}
-#contact .row{display:flex;gap:8px;justify-content:flex-end;margin-top:4px}
-#contact .row button{padding:8px 16px}
-#contact .row .ghost{background:transparent;color:var(--ink);border-color:var(--line)}
-#contact .row .go{background:var(--p1);border-color:var(--p1);color:#fff;font-weight:600}
-[data-theme=dark] #contact .row .go{color:#0c1018}
-#contact .alt{font-size:12px;color:var(--muted);margin:0}
-#contact .alt a{color:var(--p1)}
+#contact h2{margin:0 0 6px;font-size:17px}
+#contact p{margin:0 0 14px;color:var(--muted);font-size:13px}
+#contact .mail{display:block;font-size:17px;font-weight:700;color:var(--p1);word-break:break-all;padding:12px 14px;border:1px solid var(--line);border-radius:8px;background:var(--soft);text-decoration:none}
+#contact .mail:hover{text-decoration:underline}
+#contact .row{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+#contact .row button{padding:8px 16px;background:transparent;color:var(--ink);border-color:var(--line)}
+#contact .row button:hover{background:var(--hov)}
 /* loading screen */
 #loader{position:fixed;inset:0;z-index:100;display:grid;place-items:center;background:radial-gradient(ellipse at 50% 40%,#2a3346 0%,#1d2433 60%,#141925 100%);color:#fff;transition:opacity .5s ease,visibility .5s ease}
 #loader.done{opacity:0;visibility:hidden}
@@ -211,24 +205,13 @@ button.tg[aria-pressed=true]:hover{background:#2a6cbc}
 </div>
 
 <dialog id="contact" aria-labelledby="ctitle">
-  <form id="cform" novalidate>
-    <h2 id="ctitle">Contact</h2>
-    <p class="note">Questions, bug reports and suggestions are all welcome.</p>
-    <label>Type
-      <select id="ckind"><option>Inquiry</option><option>Bug report</option><option>Suggestion</option></select>
-    </label>
-    <label>Your name (optional)
-      <input id="cname" type="text" autocomplete="name">
-    </label>
-    <label>Message
-      <textarea id="cmsg" required placeholder="What would you like to ask or report?"></textarea>
-    </label>
-    <p class="alt">This opens your email app with the message ready to send. You can also email <a href="mailto:tj.shadhin001@gmail.com">tj.shadhin001@gmail.com</a> directly.</p>
-    <div class="row">
-      <button type="button" class="ghost" id="ccancel">Cancel</button>
-      <button type="submit" class="go">Open in email app</button>
-    </div>
-  </form>
+  <h2 id="ctitle">Contact</h2>
+  <p>For any inquiry, bug report or suggestion, email:</p>
+  <a class="mail" href="mailto:tj.shadhin001@gmail.com">tj.shadhin001@gmail.com</a>
+  <div class="row">
+    <button type="button" id="ccopy">Copy email</button>
+    <button type="button" id="cclose">Close</button>
+  </div>
 </dialog>
 
 <script>
@@ -382,19 +365,15 @@ $("theme").addEventListener("click", () => {
   H.setAttribute("data-theme", next); store.set("theme", next); syncTheme(); });
 syncTheme();
 
-/* contact: opens the visitor's email app with the message filled in */
+/* contact: shows the email address */
 const CONTACT = "tj.shadhin001@gmail.com";
-$("contactBtn").addEventListener("click", () => { $("cmsg").setCustomValidity(""); $("contact").showModal(); });
-$("ccancel").addEventListener("click", () => $("contact").close());
+$("contactBtn").addEventListener("click", () => { $("ccopy").textContent = "Copy email"; $("contact").showModal(); });
+$("cclose").addEventListener("click", () => $("contact").close());
 $("contact").addEventListener("click", e => { if (e.target === $("contact")) $("contact").close(); });
-$("cform").addEventListener("submit", e => {
-  e.preventDefault();
-  const kind = $("ckind").value, name = $("cname").value.trim(), msg = $("cmsg").value.trim();
-  if (!msg){ $("cmsg").reportValidity(); return; }
-  const where = cur.sel !== null ? "\n\nQuestion open: " + longLabel(rows[cur.sel]) : "";
-  const body = msg + where + (name ? "\n\nFrom: " + name : "") + "\n\nSent from O Level CS Past Papers";
-  location.href = "mailto:" + CONTACT + "?subject=" + encodeURIComponent("[O Level CS Past Papers] " + kind) + "&body=" + encodeURIComponent(body);
-  $("contact").close(); $("cform").reset();
+$("ccopy").addEventListener("click", async () => {
+  try { await navigator.clipboard.writeText(CONTACT); $("ccopy").textContent = "Copied ✓"; }
+  catch(e){ const r = document.createRange(); r.selectNodeContents(document.querySelector("#contact .mail"));
+    getSelection().removeAllRanges(); getSelection().addRange(r); $("ccopy").textContent = "Press Ctrl+C to copy"; }
 });
 
 $("topics").addEventListener("click", e => { const b = e.target.closest(".tp"); if (!b) return;
