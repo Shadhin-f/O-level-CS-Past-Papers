@@ -128,7 +128,7 @@ body.dragging{user-select:none}
       <div class="sub">May/Jun 2023 – May/Jun 2026 · 28 papers · click a question to open its paper (left) and mark scheme (right)</div>
     </div>
     <div class="ctrls">
-      <input id="q" type="search" placeholder="Search questions, e.g. SQL, parity" aria-label="Search">
+      <input id="q" type="search" placeholder="Search all topics, e.g. SQL, parity" aria-label="Search">
       <select id="fs" aria-label="Session"><option value="">All sessions</option></select>
       <select id="fv" aria-label="Viewer">
         <option value="google">Viewer: Google (recommended)</option>
@@ -197,7 +197,7 @@ function filtered(){
 
 function renderTopics(){
   const term = $("q").value.trim().toLowerCase(), ses = $("fs").value;
-  const count = k => rows.filter(r => r.t === k && (!ses || r.s === ses) && (!term || (r.x+" "+label(r)).toLowerCase().includes(term))).length;
+  const count = k => rows.filter(r => r.t === k && (!ses || r.s === ses) && (!term || (r.x+" "+label(r)+" "+D.topics[topicIdx[r.t]].name).toLowerCase().includes(term))).length;
   let h = `<button class="tp ${cur.topic==="ALL"?"on":""}" data-k="ALL">All topics<span class="n"></span></button>`;
   let last = 0;
   D.topics.forEach((t,i) => {
@@ -286,7 +286,7 @@ function open(i){
 }
 
 $("topics").addEventListener("click", e => { const b = e.target.closest(".tp"); if (!b) return;
-  cur.topic = b.dataset.k; store.set("topic", cur.topic); render(); $("list").scrollTop = 0; });
+  cur.topic = b.dataset.k; prevTopic = null; store.set("topic", cur.topic); render(); $("list").scrollTop = 0; });
 $("rows").addEventListener("click", e => { const tr = e.target.closest("tr.q"); if (tr) open(+tr.dataset.i); });
 $("rows").addEventListener("keydown", e => {
   const tr = e.target.closest("tr.q"); if (!tr) return;
@@ -295,7 +295,16 @@ $("rows").addEventListener("keydown", e => {
     const n = e.key === "ArrowDown" ? tr.nextElementSibling : tr.previousElementSibling;
     if (n && n.classList.contains("q")){ n.focus(); open(+n.dataset.i); } }
 });
-$("q").addEventListener("input", render);
+/* search is global: starting a search jumps to "All topics"; clearing it returns to the topic you were on.
+   Clicking a topic while searching narrows the results to that topic. */
+let prevTopic = null, wasEmpty = true;
+$("q").addEventListener("input", () => {
+  const empty = !$("q").value.trim();
+  if (wasEmpty && !empty){ prevTopic = cur.topic; cur.topic = "ALL"; $("list").scrollTop = 0; }
+  else if (!wasEmpty && empty && prevTopic !== null){ cur.topic = prevTopic; prevTopic = null; }
+  wasEmpty = empty;
+  render();
+});
 $("fs").addEventListener("change", render);
 
 /* resizable frames */
